@@ -1,4 +1,5 @@
-# Reproducible Data Analysis Day 3: Introduction to R and RStudio
+Reproducible Data Analysis Day 3: Introduction to R and RStudio
+================
 
 ### Learning Objectives
 
@@ -163,7 +164,7 @@ assist resume work after a break. Go through the steps for creating an
 1.  Start RStudio.
 2.  Under the `File` menu, click on `New Project`. Choose
     `New Directory`, then `New Project`.
-3.  Enter a name for this new folder (I recommend “day03-in-class”), and
+3.  Enter a name for this new folder (I recommend “day03-practice”), and
     choose a convenient location for it (I recommend creating a folder
     called “data-analysis-course” on the desktop). This will be your
     **working directory** for this project.
@@ -176,7 +177,7 @@ Let’s review what happened: we created a new R project, and RStudio
 opened the project.
 
 Look at the file pane in the lower-right. You should see some files that
-were newly created by RStudio: `.gitgnore` and `day03-in-class.Rproj`.
+were newly created by RStudio: `.gitgnore` and `day03-practice.Rproj`.
 
 We learned about `.gitignore` last week. By default, RStudio creates a
 `.gitignore` file for you that lists files that your project should
@@ -203,7 +204,11 @@ datasets, and it can lead to hard to debug errors by having objects in
 memory you forgot you had. Therefore, it is often a good idea to turn
 this off.
 
-![](images/rstudio-preferences.png)
+<figure>
+<img src="images/rstudio-preferences.png" alt="" />
+<figcaption>Set ‘Save workspace to .RData on exit’ to
+‘Never’</figcaption>
+</figure>
 
 ## Creating objects in R
 
@@ -479,17 +484,18 @@ length(animals)
     [1] 3
 
 An important feature of a vector, is that all of the elements are the
-same type of data. The function `class()` indicates what kind of object
-you are working with:
+same type of data. The function `typeof()` indicates what kind of object
+you are working with (notice that R confusingly calls numeric data
+“double”):
 
 ``` r
-class(weight_g)
+typeof(weight_g)
 ```
 
-    [1] "numeric"
+    [1] "double"
 
 ``` r
-class(animals)
+typeof(animals)
 ```
 
     [1] "character"
@@ -548,3 +554,130 @@ inputting your vector as the argument.
 Vectors are one of the many **data structures** that R uses. Other
 important ones are lists (`list`), matrices (`matrix`), data frames
 (`data.frame`), factors (`factor`) and arrays (`array`).
+
+## Subsetting vectors
+
+If we want to extract one or several values from a vector, we must
+provide one or several indices in square brackets. For instance:
+
+``` r
+animals <- c("mouse", "rat", "dog", "cat")
+animals[2]
+```
+
+    [1] "rat"
+
+``` r
+animals[c(3, 2)]
+```
+
+    [1] "dog" "rat"
+
+We can also repeat the indices to create an object with more elements
+than the original one:
+
+``` r
+more_animals <- animals[c(1, 2, 3, 2, 1, 4)]
+more_animals
+```
+
+    [1] "mouse" "rat"   "dog"   "rat"   "mouse" "cat"  
+
+R indices start at 1. Programming languages like Fortran, MATLAB, Julia,
+and R start counting at 1, because that’s what human beings typically
+do. Languages in the C family (including C++, Java, Perl, and Python)
+count from 0 because that’s simpler for computers to do.
+
+### Conditional subsetting
+
+Another common way of subsetting is by using a logical vector. `TRUE`
+will select the element with the same index, while `FALSE` will not:
+
+``` r
+weight_g <- c(21, 34, 39, 54, 55)
+weight_g[c(TRUE, FALSE, FALSE, TRUE, TRUE)]
+```
+
+    [1] 21 54 55
+
+Typically, these logical vectors are not typed by hand, but are the
+output of other functions or logical tests. For instance, if you wanted
+to select only the values above 50:
+
+``` r
+weight_g > 50    # will return logicals with TRUE for the indices that meet the condition
+```
+
+    [1] FALSE FALSE FALSE  TRUE  TRUE
+
+``` r
+## so we can use this to select only the values above 50
+weight_g[weight_g > 50]
+```
+
+    [1] 54 55
+
+You can combine multiple tests using `&` (both conditions are true, AND)
+or `|` (at least one of the conditions is true, OR):
+
+``` r
+weight_g[weight_g > 30 & weight_g < 50]
+```
+
+    [1] 34 39
+
+``` r
+weight_g[weight_g <= 30 | weight_g == 55]
+```
+
+    [1] 21 55
+
+``` r
+weight_g[weight_g >= 30 & weight_g == 21]
+```
+
+    numeric(0)
+
+Here, `>` for “greater than”, `<` stands for “less than”, `<=` for “less
+than or equal to”, and `==` for “equal to”. The double equal sign `==`
+is a test for numerical equality between the left and right hand sides,
+and should not be confused with the single `=` sign, which performs
+variable assignment (similar to `<-`).
+
+A common task is to search for certain strings in a vector. One could
+use the “or” operator `|` to test for equality to multiple values, but
+this can quickly become tedious. The function `%in%` allows you to test
+if any of the elements of a search vector are found:
+
+``` r
+animals <- c("mouse", "rat", "dog", "cat", "cat")
+
+# return both rat and cat
+animals[animals == "cat" | animals == "rat"]
+```
+
+    [1] "rat" "cat" "cat"
+
+``` r
+# return a logical vector that is TRUE for the elements within animals
+# that are found in the character vector and FALSE for those that are not
+animals %in% c("rat", "cat", "dog", "duck", "goat", "bird", "fish")
+```
+
+    [1] FALSE  TRUE  TRUE  TRUE  TRUE
+
+``` r
+# use the logical vector created by %in% to return elements from animals
+# that are found in the character vector
+animals[animals %in% c("rat", "cat", "dog", "duck", "goat", "bird", "fish")]
+```
+
+    [1] "rat" "dog" "cat" "cat"
+
+## Attributions
+
+These materials were modified by Joel H. Nitta from the Data Carpentry
+“Data Analysis and Visualization in R for Ecologists” lesson
+(https://datacarpentry.org/R-ecology-lesson) under the [CC BY
+Attribution 4.0 International
+license](https://creativecommons.org/licenses/by/4.0/).
