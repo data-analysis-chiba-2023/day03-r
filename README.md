@@ -1,4 +1,4 @@
-# day2-git
+# day03-r
 
 Instructions for completing this assignment:
 
